@@ -1,45 +1,27 @@
 
-function Player() {
-	this.name = "PLAYER";
-	this.headX = 10;
-	this.headY = 2;
-	// this.bodyPos = [/*{x:0,y:0}*/];
-	this.bodyPos = [{x:9,y:2}, {x:8,y:2}, {x:7,y:2}, {x:7,y:3}, {x:6,y:3}, {x:6,y:4}];
-	this.alive = true;
+function Player(x=Math.round(cnvDim.x/gridSize/2),y=Math.round(cnvDim.y/gridSize/2)-1, id,ip, color, dir=[0,0]) {
+	this.id = id;
+	this.ip = ip;
 
-	this.randColor = [
-		Math.floor((Math.random() * 255) + 1),
-		Math.floor((Math.random() * 255) + 1),
-		Math.floor((Math.random() * 255) + 1)
-	];
+	this.name = "PLAYER";
+	// this.headX = Math.round(cnvDim.x / gridSize / 2);
+	// this.headY = Math.round(cnvDim.y / gridSize / 2) - 1;
+	this.headX = x;
+	this.headY = y;
+	this.bodyPos = [{x: this.headX,y: this.headY}, {x: this.headX,y: this.headY}];
+	// this.bodyPos = [{x:9,y:2}, {x:8,y:2}, {x:7,y:2}, {x:7,y:3}, {x:6,y:3}, {x:6,y:4}];
+	this.alive = true;
+	this.score = 0;
+	this.dir = dir;
 
 	this.color = {
-		head: this.randColor,
-		body: this.randColor.concat([128])
+		head: color,
+		body: color.concat([192])
 	};
 
 
-	this.check = function (x,y, dir) {
-		// check wall collision
-		if (x + dir[0] >= cnvDim.x / gridSize || x + dir[0] < 0 || y + dir[1] >= cnvDim.y / gridSize || y + dir[1] < 0) {
-			return false
-		}
-
-		// check snake collision
-		for (var pCount = 0; pCount < players.length; pCount++) {
-			for (var count = 0; count < players[pCount].bodyPos.length; count++) {
-				if (x + dir[0] == players[pCount].bodyPos[count].x && y + dir[1] == players[pCount].bodyPos[count].y) {
-					return false;
-				}
-			}
-		}
-
-		return true;
-	}
-
-
-	this.move = function (dir) {
-		if (this.check(this.headX,this.headY, dir)) {
+	this.move = function () {
+		if (checkColl(this.headX,this.headY, this.dir)) {
 			// update body
 			for (var count = this.bodyPos.length - 1; count > 0; count--) {
 				this.bodyPos[count].x = this.bodyPos[count - 1].x;
@@ -50,8 +32,8 @@ function Player() {
 				this.bodyPos[0].y = this.headY;
 
 			// update head	
-			this.headX += dir[0];
-			this.headY += dir[1];
+			this.headX += this.dir[0];
+			this.headY += this.dir[1];
 		}
 
 		else {
